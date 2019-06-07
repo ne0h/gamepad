@@ -9,7 +9,9 @@ if(APPLE)
 	include_directories(/usr/local/include)
 	link_directories(/usr/local/lib)
 endif()
+
 link_libraries(SDL pthread ncurses)
 add_executable(gamepad
+                ../gamepad.cpp
                 main.cpp
 )
