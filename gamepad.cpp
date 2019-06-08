@@ -32,8 +32,8 @@ Gamepad::Gamepad() : m_quit(false) {
 
 void Gamepad::getEvent(Event &gamepadEvent) {
     SDL_Event event;
-    std::vector<bool>  buttons;
-    std::vector<int> axis;
+    std::vector<bool> buttons;
+    std::vector<int>  axis;
 
     SDL_JoystickUpdate();
     
@@ -58,6 +58,13 @@ void Gamepad::updateLoop() {
         gamepad::Event event;
         getEvent(event);
         m_ui.update(event);
+
+        m_mtx.lock();
+        for (auto it = m_callbacks.begin(); it != m_callbacks.end(); it++) {
+            (*it)(event);
+        }
+        m_mtx.unlock();
+
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
 }

@@ -2,6 +2,7 @@
 
 #include <exception>
 #include <thread>
+#include <mutex>
 
 #include <SDL2/SDL.h>
 
@@ -16,12 +17,16 @@ class NoGamepadsFoundException : public std::exception {
     }
 };
 
+using gamepadCallback = void(*)(const Event &gamepadEvent);
+
 class Gamepad {
 
 private:
     SDL_Joystick *m_gamepad;
     bool m_quit;
     UI m_ui;
+    std::vector<gamepadCallback> m_callbacks;
+    std::mutex m_mtx;
 
     void getEvent(Event &gamepadEvent);
 
@@ -29,6 +34,12 @@ private:
 
 public:
     Gamepad();
+
+    void addCallback(gamepadCallback cb) {
+        m_mtx.lock();
+        m_callbacks.push_back(cb);
+        m_mtx.unlock();
+    }
 };
 
 }
